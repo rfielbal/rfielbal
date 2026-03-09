@@ -139,6 +139,7 @@
 | Projet | Description |
 |--------|-------------|
 | [AetherCore](https://github.com/rfielbal/AetherCore) | Site qui permet de controler à l'aide de la main et de la caméra un objet 3D |
+| [Le Secret du Conservateur ](https://github.com/rfielbal/Escape-Game) | Escape game culturel sur l'art dans le cadre d'un projet en CGE |
 
 ---
 
