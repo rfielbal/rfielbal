@@ -16,9 +16,6 @@
   <a href="https://www.linkedin.com/in/rapha%C3%ABl-coursier/">
     <img src="https://img.shields.io/badge/LinkedIn-%C3%89changer-43DFFF?style=for-the-badge&amp;logo=linkedin&amp;logoColor=050505&amp;labelColor=050505" alt="Échanger avec Raphaël Coursier sur LinkedIn">
   </a>
-  <a href="mailto:contact@rfielbal.fr">
-    <img src="https://img.shields.io/badge/Email-Me%20contacter-FF5F57?style=for-the-badge&amp;logo=gmail&amp;logoColor=050505&amp;labelColor=050505" alt="Contacter Raphaël Coursier par email">
-  </a>
 </p>
 
 <picture>
@@ -37,7 +34,7 @@
   >
 </picture>
 
-<p><code>craft_over_template = true;</code></p>
+<p><code>// dans chaque réalisations, je vise la meilleure version</code></p>
 
 </div>
 
@@ -45,9 +42,9 @@
 
 ## 💡 À propos
 
-> Actuellement en **BTS SIO option SLAM** au lycée Guy Mollet d'Arras, promotion 2027, je développe mes compétences en web, mobile et logiciel avec l'objectif de poursuivre vers l'ingénierie logicielle.
+> Actuellement en première année de **BTS SIO option SLAM** au lycée Guy Mollet d'Arras, je construis mes compétences techniques pour intégrer une école d'ingénieur prestigieuse (**IMT Nord Europe**).
 >
-> **Mon profil ?** Déterminé et curieux. Je ne me contente pas de suivre les cours : j'explore chaque jour de nouvelles technologies et j'affine ma logique pour résoudre des problèmes concrets.
+> **Mon profil ?** Déterminé et curieux. Je ne me contente pas de suivre les cours : j'explore chaque jour de nouvelles technos et j'affine ma logique algorithmique pour résoudre des problèmes concrets.
 >
 > **Mon ambition ?** Devenir un développeur complet pour, à terme, **créer ma propre entreprise** de solutions logicielles.
 >
@@ -119,15 +116,5 @@
     src="https://github-readme-stats-fast.vercel.app/api/top-langs/?username=rfielbal&amp;layout=compact&amp;theme=github_dark&amp;hide_border=true"
     alt="Langages les plus présents dans les dépôts publics de Raphaël Coursier"
     height="180"
-  >
-</p>
-
----
-
-<p align="center">
-  <img
-    src="./assets/contrib-heatmap.svg"
-    alt="Grille animée des contributions GitHub de Raphaël Coursier"
-    width="100%"
   >
 </p>
