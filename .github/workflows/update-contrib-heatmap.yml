@@ -1,0 +1,68 @@
+name: Actualiser la grille de contributions
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+      timezone: "Europe/Paris"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/generate_contrib_heatmap.py"
+      - ".github/workflows/update-contrib-heatmap.yml"
+
+concurrency:
+  group: profile-contribution-heatmap
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Régénérer la grille
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Installer Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Générer la grille animée
+        run: >
+          python scripts/generate_contrib_heatmap.py
+          --username rfielbal
+          --output assets/contrib-heatmap.svg
+
+      - name: Valider le SVG
+        run: >
+          python -c
+          'import xml.etree.ElementTree as ET;
+          ET.parse("assets/contrib-heatmap.svg")'
+
+      - name: Publier uniquement si la grille a changé
+        shell: bash
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+
+          git add -- assets/contrib-heatmap.svg
+
+          if git diff --cached --quiet; then
+            echo "La grille est déjà à jour."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Actualise automatiquement la grille de contributions"
+          git push origin "HEAD:${DEFAULT_BRANCH}"
