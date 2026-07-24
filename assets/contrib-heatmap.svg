@@ -18,7 +18,8 @@
     .c, .g { opacity:1 !important; animation:none !important; }
   }
 </style>
-<rect width="888" height="158" fill="none"/>
+<rect width="888" height="158" rx="12" fill="#0d1117"/>
+<rect x="0.5" y="0.5" width="887" height="157" rx="11.5" fill="none" stroke="#30363d"/>
 <text class="lbl" x="34" y="16">Jul</text><text class="lbl" x="66" y="16">Aug</text><text class="lbl" x="146" y="16">Sep</text><text class="lbl" x="210" y="16">Oct</text><text class="lbl" x="274" y="16">Nov</text><text class="lbl" x="354" y="16">Dec</text><text class="lbl" x="418" y="16">Jan</text><text class="lbl" x="482" y="16">Feb</text><text class="lbl" x="546" y="16">Mar</text><text class="lbl" x="626" y="16">Apr</text><text class="lbl" x="690" y="16">May</text><text class="lbl" x="770" y="16">Jun</text><text class="lbl" x="834" y="16">Jul</text>
 <text class="lbl" x="2" y="51">Mon</text>
 <text class="lbl" x="2" y="83">Wed</text>

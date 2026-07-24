@@ -20,13 +20,14 @@ from pathlib import Path
 
 PALETTE = ("#161b22", "#0e4429", "#006d32", "#26a641", "#39d353")
 USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$")
+MAX_RESPONSE_BYTES = 1_000_000
 
 
 @dataclass
 class Contribution:
     day: date
     level: int
-    count: int = 0
+    count: int = -1
 
 
 class ContributionParser(HTMLParser):
@@ -52,9 +53,21 @@ class ContributionParser(HTMLParser):
 
             if "ContributionCalendar-day" in classes and cell_id and raw_day:
                 raw_level = attributes.get("data-level") or "0"
+                if cell_id in self.contributions_by_id:
+                    raise ValueError(f"Identifiant de cellule dupliqué : {cell_id}")
+                try:
+                    level = int(raw_level)
+                except ValueError as error:
+                    raise ValueError(
+                        f"Niveau de contribution invalide : {raw_level!r}"
+                    ) from error
+                if level not in range(5):
+                    raise ValueError(
+                        f"Niveau de contribution hors limites : {level}"
+                    )
                 self.contributions_by_id[cell_id] = Contribution(
                     day=date.fromisoformat(raw_day),
-                    level=max(0, min(4, int(raw_level))),
+                    level=level,
                 )
 
         if tag == "tool-tip":
@@ -73,7 +86,14 @@ class ContributionParser(HTMLParser):
 
         tooltip = " ".join(self._tooltip_parts).strip()
         match = re.search(r"([\d,]+)\s+contribution", tooltip, re.IGNORECASE)
-        count = int(match.group(1).replace(",", "")) if match else 0
+        if match:
+            count = int(match.group(1).replace(",", ""))
+        elif re.search(r"\bno contributions?\b", tooltip, re.IGNORECASE):
+            count = 0
+        else:
+            raise ValueError(
+                f"Info-bulle GitHub non reconnue : {tooltip!r}"
+            )
         self.contributions_by_id[self._tooltip_target].count = count
         self._tooltip_target = None
         self._tooltip_parts = []
@@ -100,7 +120,37 @@ def fetch_contributions(username: str, attempts: int = 3) -> str:
     for attempt in range(1, attempts + 1):
         try:
             with urllib.request.urlopen(request, timeout=30) as response:
-                return response.read().decode("utf-8")
+                if response.headers.get_content_type() != "text/html":
+                    raise RuntimeError(
+                        "Réponse GitHub inattendue : le contenu n'est pas du HTML"
+                    )
+
+                raw_length = response.headers.get("Content-Length")
+                if raw_length:
+                    try:
+                        declared_length = int(raw_length)
+                    except ValueError as error:
+                        raise RuntimeError(
+                            "Réponse GitHub invalide : taille illisible"
+                        ) from error
+                    if declared_length > MAX_RESPONSE_BYTES:
+                        raise RuntimeError(
+                            "Réponse GitHub anormalement volumineuse"
+                        )
+
+                payload = response.read(MAX_RESPONSE_BYTES + 1)
+                if len(payload) > MAX_RESPONSE_BYTES:
+                    raise RuntimeError(
+                        "Réponse GitHub anormalement volumineuse"
+                    )
+
+                charset = response.headers.get_content_charset() or "utf-8"
+                try:
+                    return payload.decode(charset)
+                except (LookupError, UnicodeDecodeError) as error:
+                    raise RuntimeError(
+                        "Réponse GitHub impossible à décoder"
+                    ) from error
         except (TimeoutError, urllib.error.URLError) as error:
             if attempt == attempts:
                 raise RuntimeError(
@@ -119,11 +169,34 @@ def parse_contributions(source: str) -> list[Contribution]:
         key=lambda contribution: contribution.day,
     )
 
-    if len(contributions) < 350:
+    if not 365 <= len(contributions) <= 371:
         raise RuntimeError(
             "Calendrier GitHub incomplet : "
-            f"{len(contributions)} cellules trouvées, au moins 350 attendues"
+            f"{len(contributions)} cellules trouvées, entre 365 et 371 attendues"
         )
+
+    days = [contribution.day for contribution in contributions]
+    if len(set(days)) != len(days):
+        raise RuntimeError("Le calendrier GitHub contient des dates dupliquées")
+
+    for previous_day, current_day in zip(days, days[1:]):
+        if current_day - previous_day != timedelta(days=1):
+            raise RuntimeError(
+                "Le calendrier GitHub contient une rupture entre "
+                f"{previous_day.isoformat()} et {current_day.isoformat()}"
+            )
+
+    for contribution in contributions:
+        if contribution.count < 0:
+            raise RuntimeError(
+                "Une cellule GitHub ne possède aucune info-bulle exploitable : "
+                f"{contribution.day.isoformat()}"
+            )
+        if (contribution.level == 0) != (contribution.count == 0):
+            raise RuntimeError(
+                "Niveau et nombre de contributions incohérents pour "
+                f"{contribution.day.isoformat()}"
+            )
 
     return contributions
 
@@ -208,7 +281,8 @@ def render_svg(contributions: list[Contribution]) -> str:
     .c, .g {{ opacity:1 !important; animation:none !important; }}
   }}
 </style>
-<rect width="888" height="158" fill="none"/>
+<rect width="888" height="158" rx="12" fill="#0d1117"/>
+<rect x="0.5" y="0.5" width="887" height="157" rx="11.5" fill="none" stroke="#30363d"/>
 {labels}
 <text class="lbl" x="2" y="51">Mon</text>
 <text class="lbl" x="2" y="83">Wed</text>
