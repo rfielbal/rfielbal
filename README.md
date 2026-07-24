@@ -42,7 +42,7 @@
 
 ## 💡 À propos
 
-> Actuellement en première année de **BTS SIO option SLAM** au lycée Guy Mollet d'Arras, je construis mes compétences techniques pour intégrer une école d'ingénieur prestigieuse (**IMT Nord Europe**).
+> Actuellement en deuxième année de **BTS SIO option SLAM** au lycée Guy Mollet d'Arras, je construis mes compétences techniques pour intégrer une école d'ingénieur prestigieuse (**IMT Nord Europe**).
 >
 > **Mon profil ?** Déterminé et curieux. Je ne me contente pas de suivre les cours : j'explore chaque jour de nouvelles technos et j'affine ma logique algorithmique pour résoudre des problèmes concrets.
 >
